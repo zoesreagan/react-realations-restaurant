@@ -1,0 +1,14 @@
+.Modal-Closed {
+  display: none;
+}
+
+.Modal-Open {
+  display: block;
+  background-color: rgba(116, 168, 150, 0.6);
+  text-align: center;
+  position: absolute;
+  width: 35%;
+  height: 100px;
+  margin-left: 35%;
+  margin-top: -88px;
+}
