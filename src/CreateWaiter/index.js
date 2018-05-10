@@ -20,7 +20,7 @@ class CreateWaiter extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
+    
     this.props.addWaiter(this.state.name);
     //adding an item to database and make a POST request to Sinatra server
   }
@@ -29,7 +29,7 @@ class CreateWaiter extends Component {
     return(
       <form onSubmit={this.handleSubmit}>
         <label form="waiter" />
-        <input type="text" onChange={this.updateWaiter}/>
+        <input type="text" name="waitername" onChange={this.updateWaiter}/>
         <input type="submit" />
       </form>
     )

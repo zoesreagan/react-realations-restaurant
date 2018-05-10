@@ -1,34 +1,21 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './style.css';
 
-class OrderModal extends Component {
-  constructor(){
-    super();
-
-    this.state = {
-
-    }
-  }
-
-  render(){
-    const cssClass = this.props.modalState ? 'Modal-Open' : 'Modal-Closed'
-    return(
-            <div className={cssClass}>
-            </div>)
-
-    const orderList = ({waiters, getOrdersByWaiter}) => {
-      console.log(waiters);
-      const orderItems = orderItems.map((orders, i) => {
-        return (
-          <li key={orders.id}>{orders}
-            </li>)
-            })
-        return (
-            <ul>{orderList}</ul>
-          )}
-        }
-    }
+const OrderModal = (props) => {
 
 
+  console.log(props, " this is this.props");
+  // console.log(this.state, " this is this.state");
+
+  const cssClass = props.modalOpen ? 'Modal-Open' : 'Modal-Closed'
+  // const cssClass = 'Modal-Open'
+
+  const list = props.orders.map((order, i) => <li key={i}>{order.notes}</li>)
+
+  return(
+    <ul className={cssClass}>{list}</ul>
+  )
+
+}
 
 export default OrderModal;

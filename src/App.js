@@ -16,14 +16,15 @@ class App extends Component {
       menuItems: [],
       // edited_waiter: '',
       // edited_menu_item: ''
-      modalOpen: false
-
+      modalOpen: false,
+      orders: []
     }
   }
 
   componentDidMount(){
     this.getWaiters()
     .then((response) => {
+      console.log(response)
       this.setState({waiters: response});
     })
 
@@ -35,14 +36,8 @@ class App extends Component {
     .then((response) => {
       this.setState({menuItems: response});
     })
-
     .catch((err) => {
       console.log(err);
-    })
-
-    this.getOrdersByWaiter()
-    .then((response) => {
-      this.setState({waiterOrderItems: response});
     })
 
     .catch((err) => {
@@ -52,7 +47,9 @@ class App extends Component {
 
   getWaiters = async () => {
     const waitersJson = await fetch('http://localhost:9292/waiters');
+    console.log(waitersJson, " waitersJson");
     const waiters = await waitersJson.json();
+    console.log(waiters)
     return waiters
 
   }
@@ -70,7 +67,8 @@ class App extends Component {
     });
 
     const waiterParsed = await waiter.json();
-    this.setState({waiter: [...this.state.waiter, waiterParsed]})
+    console.log(waiterParsed, ".... this is waiter parsed in addWaiter")
+    this.setState({waiters: [...this.state.waiters, waiterParsed]})
     return waiterParsed;
   }
 
@@ -88,22 +86,27 @@ class App extends Component {
   deleteWaiter = async (e) => {
     console.log("is delete item being clicked?");
 
-    const id = e.currentTarget.id;
+    const id = e.currentTarget.parentNode.id;
 
     console.log(id, 'this is the id in deleteWaiter');
 
     const waiter = await fetch('http://localhost:9292/waiters/' + id, {
         method: 'DELETE'
     });
-    try {
-      await waiter.json();
-      this.setState({waiters: this.state.waiters.filter((waiter) => waiter.id !== id)})
-    }
 
-    catch(err){
-      console.log(err);
-    }
+    const parsedResponse = await waiter.json();
+    console.log(parsedResponse, "parsedResponse in deleteWaiter");
+    
+    if(parsedResponse.success) {
+      try {
 
+        this.setState({waiters: this.state.waiters.filter(waiter => waiter.id != id)})
+      }
+
+      catch(err){
+        console.log(err);
+      }
+    }
   }
 
   deleteMenuItem = async (e) => {
@@ -125,29 +128,35 @@ class App extends Component {
     }
   }
 
-  getOrdersByWaiter = async (e) => {
-    console.log("orders button is being clicked");
-    //need to launch modal that shows order
-  }
 
-  openModal = (e) => {
-
+    // this.getOrdersByWaiterAndOpenModal()
+    // .then((response) => {
+    //   this.setState({waiterOrderItems: response});
+    // })
+  getOrdersByWaiterAndOpenModal = async (e) => {
+    const id = e.currentTarget.parentNode.id;
+    console.log(id, "id for the next thing")
+    const resolvedResponsePromise = await fetch('http://localhost:9292/waiters/' + id + '/orders');
+    const parsedResponse = await resolvedResponsePromise.json()
+    console.log(parsedResponse, "parsedResponse from getOrdersByWaiterAndOpenModal in App")
     this.setState({
       modalOpen: true,
+      orders: parsedResponse.orders
     })
   }
 
+
   render() {
-    console.log(this.state, "this is this.state in JS");
+    console.log(this.state, "this is this.state in App");
 
     return (
       <div className="App">
         <h4>This is a restaurant app</h4>
-        <WaiterList waiters={this.state.waiters}  getOrdersByWaiter={this.getOrdersByWaiter} deleteWaiter={this.deleteWaiter} openModal={this.openModal} />
+        <WaiterList waiters={this.state.waiters}  getOrdersByWaiterAndOpenModal={this.getOrdersByWaiterAndOpenModal} deleteWaiter={this.deleteWaiter} openModal={this.openModal} />
         <CreateWaiter addWaiter={this.addWaiter} />
         <MenuItemList menuItems={this.state.menuItems} deleteMenuItem={this.deleteMenuItem} />
         <CreateMenuItem addMenuItem={this.addMenuItem} />
-        <OrderModal modalState={this.state.modalOpen} />
+        <OrderModal modalOpen={this.state.modalOpen} orders={this.state.orders} />
       </div>
     );
   }
